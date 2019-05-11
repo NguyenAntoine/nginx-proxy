@@ -7,10 +7,9 @@ services:
      - "443:443"
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
-      #- ./nginx.conf:/etc/nginx/conf.d/my_proxy.conf:ro
-      - ./vhost.d:/etc/nginx/vhost.d
-      - ./certs:/etc/nginx/certs
-      - ./html:/usr/share/nginx/html
+      - vhost:/etc/nginx/vhost.d
+      - certs:/etc/nginx/certs
+      - html:/usr/share/nginx/html
     networks:
       - reverse-proxy
     labels:
@@ -19,10 +18,20 @@ services:
   nginx-proxy-letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     volumes_from:
       - "nginx-proxy"
     restart: always
+    environment:
+      #- DEBUG=true
+
+volumes:
+  conf:
+  vhost:
+  html:
+  dhparam:
+  certs:
+
 networks:
   reverse-proxy:
     external:
