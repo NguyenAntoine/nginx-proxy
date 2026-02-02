@@ -1,10 +1,13 @@
-version: '2'
+version: '3.8'
+
 services:
   nginx-proxy:
-    image: jwilder/nginx-proxy
+    image: jwilder/nginx-proxy:latest
+    container_name: nginx-proxy
+    restart: always
     ports:
-     - "80:80"
-     - "443:443"
+      - "80:80"
+      - "443:443"
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - vhost:/etc/nginx/vhost.d
@@ -13,26 +16,33 @@ services:
     networks:
       - reverse-proxy
     labels:
-      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy"
-    restart: always
+      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   nginx-proxy-letsencrypt:
-    image: jrcs/letsencrypt-nginx-proxy-companion
+    image: jrcs/letsencrypt-nginx-proxy-companion:latest
+    container_name: nginx-proxy-letsencrypt
+    restart: always
+    depends_on:
+      - nginx-proxy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    volumes_from:
-      - "nginx-proxy"
-    restart: always
+      - vhost:/etc/nginx/vhost.d
+      - certs:/etc/nginx/certs
+      - html:/usr/share/nginx/html
     environment:
-      #- DEBUG=true
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+      # - DEBUG=true (Uncomment for troubleshooting)
 
 volumes:
-  conf:
   vhost:
-  html:
-  dhparam:
   certs:
+  html:
 
 networks:
   reverse-proxy:
-    external:
-      name: reverse-proxy
+    external: true
