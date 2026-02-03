@@ -8,9 +8,9 @@ services:
       - "443:443"
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
-      - vhost:/etc/nginx/vhost.d
-      - certs:/etc/nginx/certs
-      - html:/usr/share/nginx/html
+      - ./vhost.d:/etc/nginx/vhost.d
+      - ./certs:/etc/nginx/certs
+      - ./html:/usr/share/nginx/html
     networks:
       - reverse-proxy
     labels:
@@ -24,17 +24,12 @@ services:
       - nginx-proxy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - vhost:/etc/nginx/vhost.d
-      - certs:/etc/nginx/certs
-      - html:/usr/share/nginx/html
+      - ./vhost.d:/etc/nginx/vhost.d
+      - ./certs:/etc/nginx/certs
+      - ./html:/usr/share/nginx/html
     environment:
       - NGINX_PROXY_CONTAINER=nginx-proxy
       # - DEBUG=true (Uncomment for troubleshooting)
-
-volumes:
-  vhost:
-  certs:
-  html:
 
 networks:
   reverse-proxy:
