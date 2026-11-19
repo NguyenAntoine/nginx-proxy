@@ -1,6 +1,7 @@
 services:
   nginx-proxy:
-    image: jwilder/nginx-proxy:latest
+    build: .
+    image: nginx-proxy-patched:1.11.6-nginx1.31.9
     container_name: nginx-proxy
     restart: always
     ports:
@@ -17,7 +18,7 @@ services:
       - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true"
 
   nginx-proxy-letsencrypt:
-    image: jrcs/letsencrypt-nginx-proxy-companion:latest
+    image: nginxproxy/acme-companion:latest
     container_name: nginx-proxy-letsencrypt
     restart: always
     depends_on:
